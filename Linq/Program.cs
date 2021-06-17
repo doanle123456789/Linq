@@ -12,7 +12,7 @@ namespace LinqDemo
             {
                 new Brand{ID=1, Name="Cong ty AAA"},
                 new Brand{ID=2, Name="Cong ty BBB"},
-                new Brand{ID=3, Name="Cong ty CCC"}
+                new Brand{ID=4, Name="Cong ty CCC"}
             };
 
             var products = new List<Product>()
@@ -98,7 +98,67 @@ namespace LinqDemo
             //vd: trong danh sach cac gia lay ra gia nho nhat, we viet la trong ds cac sp products, goi pthuc Min(), phthuc Min()
             //nay duoc tinh toan tren cac tap so, nhung tap so nay duoc lay ra tu gia cua san pham
             Console.WriteLine(products.Min(p => p.Price));
+
+            //*Join
+            //Pthuc Join ket hop cac nguon du lieu de lay ra san pham phu hop. vd: Moi sp lay ra ten sp va ten hang sx, ten sp nam trong 
+            //nguon Product, con hang SX nam trong nguon Brand. Nhu vay moi sp thi phai tra cuu tu 2 nguon.
+            //Cach viet: nguon thu nhat la cac san pham, ket hop Join, tham so dau tien la nguon de ket hop, du lieu nao trong products
+            //dung de ket hop, du lieu nao trong nguon brands dung de ket hop, kq lay ra thi we dua vao delegate co 2 tham so gom so
+            //san pham lay duoc va nhan hieu lay duoc, delegate tra ve dl gi thi no nam trong tap ket qua. o day chung ta tra ve mot
+            //doi tuong gom co ten = ten san pham, thuong hieu = ten nhan hieu.
+
+            var kq2 = products.Join(brands, p => p.Brand, b => b.ID, (p,b) => {
+                return new
+                {
+                    Ten = p.Name,
+                    Thuonghieu = b.Name
+                };
+            });
+
+            foreach (var item in kq2)
+            {
+                Console.WriteLine(item);
+            }
+
+            //*GroupJoin
+            //hoat dong tuong tu nhu Join, tuy nhien nhung phan tu tra ve no la mot cai nhom ma no duoc nhom lai theo cai nguon ban dau
+            //vd: we co danh sach nhung nhan hieu, voi moi thuong hieu, liet ke nhung sp thuoc thuong hieu do ra.
+            //thuc hien: nguon tao nhom.GroupJoin(tham so thu nhat la nguon nhung phan tu nam trong nhom, tham so tiep theo la du lieu
+            //ban dau mang ra tao nhom do la voi moi pham tu b thuoc brand thi lay ra du lieu b.ID, du lieu nay mang ra so sanh voi du
+            //lieu nao cua phan tu thuoc nhom, voi moi phan tu p thuoc products thi lay ra Brand. Nhung phan tu p thuoc Product ma co
+            //Brand == ID thi tat ca nhung phan tu do se dua vao mot nhom, tham so cuoi cung la mot delegate, delegate nay gom co 2 
+            //tham so, tham so thu nhat la nhan hieu lay ra duoc de tao nhom, tham so thu hai la tap hop nhung phan tu thuoc nhom do
+            //delegate nay we thiet ke no tra ve nhung phan tu, vd kieu vo danh
+
+            var kq3 = brands.GroupJoin(products, b => b.ID, p => p.Brand,
+                (bra, pros) =>
+                {
+                    return new
+                    {
+                        Thuonghieu = bra.Name,
+                        Cacsanpham = pros
+                    };
+                }  
+             );
+
+            foreach (var gr in kq3)
+            {
+                Console.WriteLine(gr.Thuonghieu);
+                foreach (var p in gr.Cacsanpham)
+                {
+                    Console.WriteLine(p);
+                }
+            }
+
+            //*Take()
+            //Phthuc Take() lay ra mot so san pham dau tien. vd: nguon la producs, lay 3 san pham dau tien.
+            //In ra, chung ta convert sang List(). vi trong List co phuong thuc foreach, duyet qua tung phan tu, moi phan tu ay
+            //la p, chung ta thuc hien ConsoleWrite(p)
+
+            products.Take(5).ToList().ForEach(p => Console.WriteLine(p));
                
         }
+
+
     }
 }
